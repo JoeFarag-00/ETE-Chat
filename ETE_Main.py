@@ -18,6 +18,16 @@ import socket
 
 sys.path.append('Encryptions/Single-Key/Classical')
 from Caesar import caesar
+sys.path.append('Encryptions/Single-Key/Classical')
+from Monoalphabetic import monoalphabetic
+sys.path.append('Encryptions/Single-Key/Classical')
+from PlayFair import playfair
+sys.path.append('Encryptions/Single-Key/Classical')
+from RailFence import railfence
+sys.path.append('Encryptions/Single-Key/Classical')
+from RowTransposition import rowtransposition
+sys.path.append('Encryptions/Single-Key/Classical')
+from Vigenere import vigenere
 sys.path.append('Encryptions/Dual-Key/RSA')
 from edRSA import RSA_KeyGen
 
@@ -82,13 +92,13 @@ class MainGUI:
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Nurse", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=1, column=0, padx=20)
         
-        self.Profile_Button = customtkinter.CTkButton(self.sidebar_frame, text="Profile")
-        self.Profile_Button.grid(row=2, column=0, padx=20, pady=10)
+        # self.Profile_Button = customtkinter.CTkButton(self.sidebar_frame, text="Profile")
+        # self.Profile_Button.grid(row=2, column=0, padx=20, pady=10)
  
         self.Encryption_Box = customtkinter.CTkComboBox(self.sidebar_frame,
         values=["DES", "AES", "RSA", "RC4", "El Gammal", "Caesar", "Monoalphabetic","PlayFair","RailFence","Row Transposition", "Vigenere", "None"],command=self.Encryption_Callback)
-        self.Encryption_Box.grid(row=3, column=0, padx=20, pady=(0, 0))
-        self.Encryption_Box.set("Choose Encryption")
+        self.Encryption_Box.grid(row=3, column=0, padx=20, pady=(10, 10))
+        self.Encryption_Box.set("Encryptions")
         
         self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
         self.appearance_mode_label.grid(row=6, column=0, padx=20, pady=(10, 0))
@@ -127,6 +137,7 @@ class MainGUI:
         if Type == "None":
             self.IsEncryption = False
             try:
+                self.KeyBox.destroy()
                 self.KeyEntry.destroy()
                 self.Set_Key_Button.destroy()
             except:
@@ -134,6 +145,7 @@ class MainGUI:
         elif Type == "Caesar":
             self.IsEncryption = True
             try:
+                self.KeyBox.destroy()
                 self.KeyEntry.destroy()
                 self.Set_Key_Button.destroy()
             except:
@@ -144,8 +156,82 @@ class MainGUI:
             self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
                                                         text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
             self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
-
-    
+        elif Type == "Monoalphabetic":
+            self.IsEncryption = True
+            try:
+                self.KeyBox.destroy()
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
+            
+            self.KeyBox = customtkinter.CTkTextbox(self.sidebar_frame, width=140, height=150)
+            self.KeyBox.grid(row=4, column=0, padx=(0, 0), pady=(0, 0))
+                
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+        elif Type == "PlayFair":
+            self.IsEncryption = True
+            try:
+                self.KeyBox.destroy()
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
+            
+            self.KeyBox = customtkinter.CTkTextbox(self.sidebar_frame, width=140, height=150)
+            self.KeyBox.grid(row=4, column=0, padx=(0, 0), pady=(0, 0))
+                
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+        elif Type == "RailFence":
+            self.IsEncryption = True
+            try:
+                self.KeyBox.destroy()
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
+            
+            self.KeyEntry = customtkinter.CTkEntry(self.sidebar_frame, placeholder_text="Enter Key")
+            self.KeyEntry.grid(row=4, column=0, padx=(0, 0), pady=(5, 5))
+                
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+        elif Type == "Row Transposition":
+            self.IsEncryption = True
+            try:
+                self.KeyBox.destroy()
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
+            
+            self.KeyEntry = customtkinter.CTkEntry(self.sidebar_frame, placeholder_text="Enter Key")
+            self.KeyEntry.grid(row=4, column=0, padx=(0, 0), pady=(5, 5))
+                
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+        elif Type == "Vigenere":
+            self.IsEncryption = True
+            try:
+                self.KeyBox.destroy()
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
+            
+            self.KeyBox = customtkinter.CTkTextbox(self.sidebar_frame, width=140, height=150)
+            self.KeyBox.grid(row=4, column=0, padx=(0, 0), pady=(0, 0))
+                
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+            
     def Set_Key(self):
         Type = self.Encryption_Box.get()
         if Type == "None" or Type == "Choose Encryption":
@@ -156,10 +242,49 @@ class MainGUI:
                 key = int(self.KeyEntry.get())
                 self.Caesar = caesar(key)
                 print("Caesar Loaded Key: ", key,"\n")
-            except:
-                print("Caesar Error")
-
-        
+            except Exception as e:
+                print("Caesar Error", e)
+        elif Type == "Monoalphabetic":
+            self.IsEncryption = True
+            try:
+                key = self.KeyBox.get("0.0", "end")
+                self.Mono = monoalphabetic(key)
+                print("Monoalphabetic Loaded Key: ", key,"\n")
+            except Exception as e:
+                print("Monoalphabetic Error:",e)
+        elif Type == "PlayFair":
+            self.IsEncryption = True
+            try:
+                key = self.KeyBox.get("0.0", "end")
+                self.PlayFair = playfair(key)
+                print("PlayFair Loaded Key: ", key,"\n")
+            except Exception as e:
+                print("PlayFair Error:",e)
+        elif Type == "RailFence":
+            self.IsEncryption = True
+            try:
+                key = int(self.KeyEntry.get())
+                self.RailFence = railfence(key)
+                print("RailFence Loaded Key: ", key,"\n")
+            except Exception as e:
+                print("RailFence Error", e)
+        elif Type == "Row Transposition":
+            self.IsEncryption = True
+            try:
+                key = self.KeyEntry.get()
+                self.RowTrans = rowtransposition(key)
+                print("Row Transposition Loaded Key: ", key,"\n")
+            except Exception as e:
+                print("Row Transposition Error", e)
+        elif Type == "Vigenere":
+            self.IsEncryption = True
+            try:
+                key = self.KeyBox.get("0.0", "end")
+                self.Vigenere = vigenere(key)
+                print("Vigenere Loaded Key: ", key,"\n")
+            except Exception as e:
+                print("Vigenere Error", e)
+            
     def Send_Message(self):
         Send_Message = self.entry.get()
         Type = self.Encryption_Box.get()
@@ -168,11 +293,32 @@ class MainGUI:
             # self.textbox.configure(state="normal")
             if Type == "None" or not self.IsEncryption:
                 client_socket.send(Send_Message.encode('utf-8'))
-            if Type == "Caesar":
+            elif Type == "Caesar":
                 Encrypted_Message = self.Caesar.encrypt(Send_Message)
                 print("Caesar Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
-                
+            elif Type == "Monoalphabetic":
+                Encrypted_Message = self.Mono.encrypt(Send_Message)
+                print("Monoalphabetic Message:", Encrypted_Message,"\n\n")
+                client_socket.send(Encrypted_Message.encode('utf-8'))
+            elif Type == "PlayFair":
+                Encrypted_Message = self.PlayFair.encrypt(Send_Message)
+                print("PlayFair Message:", Encrypted_Message,"\n\n")
+                client_socket.send(Encrypted_Message.encode('utf-8'))
+            elif Type == "RailFence":
+                Encrypted_Message = self.RailFence.encrypt(Send_Message)
+                print("RailFence Message:", Encrypted_Message,"\n\n")
+                client_socket.send(Encrypted_Message.encode('utf-8'))
+            elif Type == "Row Transposition":
+                Encrypted_Message = self.RowTrans.encrypt(Send_Message)
+                print("Row Transposition Message:", Encrypted_Message,"\n\n")
+                client_socket.send(Encrypted_Message.encode('utf-8'))
+            elif Type == "Vigenere":
+                Encrypted_Message = self.Vigenere.encrypt(Send_Message)
+                print("Vigenere Message:", Encrypted_Message,"\n\n")
+                client_socket.send(Encrypted_Message.encode('utf-8'))
+            
+            
             
             self.entry.delete(0, len(Send_Message))
             self.textbox.insert("end", f"[{self.Auth_Name}]:\n{Send_Message}\n\n")
@@ -190,11 +336,26 @@ class MainGUI:
                     Dec_Rec_Message = self.Caesar.decrypt(self.Rec_Message)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
-
-                # if not self.Rec_Message:
-                #     print("REC BREAK")
-                #     break
-
+                elif self.Rec_Type == "Monoalphabetic":
+                    Dec_Rec_Message = self.Mono.decrypt(self.Rec_Message)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
+                    self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
+                elif self.Rec_Type == "PlayFair":
+                    Dec_Rec_Message = self.PlayFair.decrypt(self.Rec_Message)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
+                    self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
+                elif self.Rec_Type == "RailFence":
+                    Dec_Rec_Message = self.RailFence.decrypt(self.Rec_Message)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
+                    self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
+                elif self.Rec_Type == "Row Transposition":
+                    Dec_Rec_Message = self.RowTrans.decrypt(self.Rec_Message)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
+                    self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
+                elif self.Rec_Type == "Vigenere":
+                    Dec_Rec_Message = self.Vigenere.decrypt(self.Rec_Message)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
+                    self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
            
     def set_name(self):
         self.logo_label.configure(text=self.Auth_Name)
