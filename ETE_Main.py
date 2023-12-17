@@ -47,6 +47,8 @@ class MainGUI:
         self.Auth_Name = ""
         self.Rec_Type = None
         self.loaded_dashboard_event = threading.Event()
+        # self.KeyBox = None
+        # self.KeyEntry = None
 
         # self.Rsa_KeyGen = RSA_KeyGen()
         # self.Caesar = caesar()
@@ -106,7 +108,7 @@ class MainGUI:
         self.appearance_mode_options.grid(row=6, column=0, padx=20, pady=(10, 10))
         
         self.exit_button = customtkinter.CTkButton(self.sidebar_frame, text="Exit", hover_color="Red", command=self.Exit)
-        self.exit_button.grid(row=7, column=0, padx=20, pady=10)
+        self.exit_button.grid(row=7, column=0, padx=20, pady=5)
         
         self.set_name()
         
@@ -128,7 +130,12 @@ class MainGUI:
         
         self.Loaded_Dashboard = True
 
-
+    def Fix_Spacing(self,message,target):
+        if target == 1:
+            return message.replace(' ', 'x')
+        else:
+            return message.replace('x', ' ')
+    
     def Encryption_Callback(self,Type):
         print("\n\nEncryption Type: ", Type)
         # print(self.Encryption_Box.get())
@@ -233,7 +240,10 @@ class MainGUI:
             self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
             
     def Set_Key(self):
+        self.WarningLabel3 = customtkinter.CTkLabel(Main, text="Incorrect Key", font=customtkinter.CTkFont(size=12, weight="bold"), text_color="red")
+        
         Type = self.Encryption_Box.get()
+        
         if Type == "None" or Type == "Choose Encryption":
             self.IsEncryption = False
         elif Type == "Caesar":
@@ -284,44 +294,52 @@ class MainGUI:
                 print("Vigenere Loaded Key: ", key,"\n")
             except Exception as e:
                 print("Vigenere Error", e)
+     
+            
             
     def Send_Message(self):
         Send_Message = self.entry.get()
         Type = self.Encryption_Box.get()
         if Send_Message:
+             
+            self.entry.delete(0, len(Send_Message))
+            self.textbox.insert("end", f"[{self.Auth_Name}]:\n{Send_Message}\n\n")
+            
             print("Original Message: ",Send_Message)
             # self.textbox.configure(state="normal")
             if Type == "None" or not self.IsEncryption:
                 client_socket.send(Send_Message.encode('utf-8'))
             elif Type == "Caesar":
+                Send_Message = self.Fix_Spacing(Send_Message, 1)
                 Encrypted_Message = self.Caesar.encrypt(Send_Message)
                 print("Caesar Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
             elif Type == "Monoalphabetic":
+                Send_Message = self.Fix_Spacing(Send_Message, 1)
                 Encrypted_Message = self.Mono.encrypt(Send_Message)
                 print("Monoalphabetic Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
             elif Type == "PlayFair":
+                Send_Message = self.Fix_Spacing(Send_Message, 1)
                 Encrypted_Message = self.PlayFair.encrypt(Send_Message)
                 print("PlayFair Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
             elif Type == "RailFence":
+                Send_Message = self.Fix_Spacing(Send_Message, 1)
                 Encrypted_Message = self.RailFence.encrypt(Send_Message)
                 print("RailFence Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
             elif Type == "Row Transposition":
+                Send_Message = self.Fix_Spacing(Send_Message, 1)
                 Encrypted_Message = self.RowTrans.encrypt(Send_Message)
                 print("Row Transposition Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
             elif Type == "Vigenere":
+                Send_Message = self.Fix_Spacing(Send_Message, 1)
                 Encrypted_Message = self.Vigenere.encrypt(Send_Message)
                 print("Vigenere Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
             
-            
-            
-            self.entry.delete(0, len(Send_Message))
-            self.textbox.insert("end", f"[{self.Auth_Name}]:\n{Send_Message}\n\n")
             # self.textbox.configure(state="disabled")
                     
     def Recieve_Message(self):
@@ -334,26 +352,32 @@ class MainGUI:
                     self.textbox.insert("end", f"[Mina]:\n{self.Rec_Message}\n\n")
                 elif self.Rec_Type == "Caesar":
                     Dec_Rec_Message = self.Caesar.decrypt(self.Rec_Message)
+                    Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
                 elif self.Rec_Type == "Monoalphabetic":
                     Dec_Rec_Message = self.Mono.decrypt(self.Rec_Message)
+                    Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
                 elif self.Rec_Type == "PlayFair":
                     Dec_Rec_Message = self.PlayFair.decrypt(self.Rec_Message)
+                    Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
                 elif self.Rec_Type == "RailFence":
                     Dec_Rec_Message = self.RailFence.decrypt(self.Rec_Message)
+                    Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
                 elif self.Rec_Type == "Row Transposition":
                     Dec_Rec_Message = self.RowTrans.decrypt(self.Rec_Message)
+                    Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
                 elif self.Rec_Type == "Vigenere":
                     Dec_Rec_Message = self.Vigenere.decrypt(self.Rec_Message)
+                    Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
            
