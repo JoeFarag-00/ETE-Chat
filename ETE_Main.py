@@ -32,6 +32,12 @@ class MainGUI:
         self.start_chat = False
         self.LineCt = 0
         self.IsEncryption = False
+        self.Loaded_Dashboard = False
+        self.Rec_Message = None
+        self.Auth_Name = ""
+        self.Rec_Type = None
+        self.loaded_dashboard_event = threading.Event()
+
         # self.Rsa_KeyGen = RSA_KeyGen()
         # self.Caesar = caesar()
         
@@ -109,89 +115,86 @@ class MainGUI:
         self.Send_Button = customtkinter.CTkButton(self.Main, text="Send", fg_color="transparent", border_width=2,
                                                 text_color=("gray10", "#DCE4EE"), command=self.Send_Message)
         self.Send_Button.grid(row=3, column=2, padx=(20, 20), pady=(20, 20), sticky="nsew")
+        
+        self.Loaded_Dashboard = True
+
 
     def Encryption_Callback(self,Type):
-        print("Encryption Type: ", Type)
-        if Type == "Caesar":
-            self.IsEncryption = True
-            self.KeyEntry = customtkinter.CTkEntry(self.sidebar_frame, placeholder_text="Enter Key")
-            self.KeyEntry.grid(row=4, column=0, padx=(0, 0), pady=(5, 5), sticky="nsew")
-            
-            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
-                                                    text_color=("gray10", "#DCE4EE"), command=self.Set_Key(Type))
-            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5), sticky="nsew")
-            # self.Caesar = caesar()
-        return Type
-    
-    def Set_Key(self,Type):
-        if Type == "None" or Type == "Choose Encryption":
+        print("\n\nEncryption Type: ", Type)
+        # print(self.Encryption_Box.get())
+        self.Rec_Type = self.Encryption_Box.get()
+        Type = self.Encryption_Box.get()
+        if Type == "None":
             self.IsEncryption = False
-            print("NO ENCRYPTION")
+            try:
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
         elif Type == "Caesar":
             self.IsEncryption = True
             try:
-                if self.KeyEntry.get():
-                    key = int(self.KeyEntry.get())
-                    if 0 <= key <= 26:
-                        self.Caesar = caesar(key)
-            except ValueError:
-                print("Caesar Failed")
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
                 pass
+            self.KeyEntry = customtkinter.CTkEntry(self.sidebar_frame, placeholder_text="Enter Key")
+            self.KeyEntry.grid(row=4, column=0, padx=(0, 0), pady=(5, 5))
                 
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+
+    
+    def Set_Key(self):
+        Type = self.Encryption_Box.get()
+        if Type == "None" or Type == "Choose Encryption":
+            self.IsEncryption = False
+        elif Type == "Caesar":
+            self.IsEncryption = True
+            try:
+                key = int(self.KeyEntry.get())
+                self.Caesar = caesar(key)
+                print("Caesar Loaded Key: ", key,"\n")
+            except:
+                print("Caesar Error")
 
         
     def Send_Message(self):
         Send_Message = self.entry.get()
+        Type = self.Encryption_Box.get()
         if Send_Message:
+            print("Original Message: ",Send_Message)
             # self.textbox.configure(state="normal")
-            if self.Encryption_Callback == "None" or not self.IsEncryption:
-                self.IsEncryption = False
+            if Type == "None" or not self.IsEncryption:
                 client_socket.send(Send_Message.encode('utf-8'))
-            if self.Encryption_Callback == "Caesar":
+            if Type == "Caesar":
                 Encrypted_Message = self.Caesar.encrypt(Send_Message)
+                print("Caesar Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
-            elif self.Encryption_Callback == "DES":
-                print("DES")
-                # encrypted_message = DES.encrypt(Send_Message)
-            elif self.Encryption_Callback == "AES":
-                print("AES")
-            elif self.Encryption_Callback == "RSA":
-                print("RSA")
-                Send_Message = self.Rsa_KeyGen.key_generation(1024)
                 
             
             self.entry.delete(0, len(Send_Message))
             self.textbox.insert("end", f"[{self.Auth_Name}]:\n{Send_Message}\n\n")
             # self.textbox.configure(state="disabled")
-        
-            detailed_message = self.tabview.get() + "--" + Send_Message
-            
+                    
     def Recieve_Message(self):
         while True:
-            try:
-                Rec_Message = client_socket.recv(1024).decode('utf-8')
-                
-                if self.Encryption_Callback == "None" or not self.IsEncryption:
-                    self.textbox.insert("end", f"[Mina]:\n{Rec_Message}\n\n")
-                if self.Encryption_Callback == "Caesar":
-                    Dec_Rec_Message = self.Caesar.decrypt(Rec_Message)
+                self.Rec_Message = None 
+                self.Rec_Message = client_socket.recv(1024).decode('utf-8')
+                print("Received Encrypted:",self.Rec_Message)
+
+                if self.Rec_Type == "None" or not self.IsEncryption:
+                    self.textbox.insert("end", f"[Mina]:\n{self.Rec_Message}\n\n")
+                elif self.Rec_Type == "Caesar":
+                    Dec_Rec_Message = self.Caesar.decrypt(self.Rec_Message)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
-                elif self.Encryption_Callback == "DES":
-                    print("DES")
-                    # encrypted_message = DES.encrypt(Send_Message)
-                elif self.Encryption_Callback == "AES":
-                    print("AES")
-                elif self.Encryption_Callback == "RSA":
-                    print("RSA")
-                    Send_Message = self.Rsa_KeyGen.key_generation(1024)   
-                     
-                if not Rec_Message:
-                    break
 
+                # if not self.Rec_Message:
+                #     print("REC BREAK")
+                #     break
 
-            except Exception as e:
-                print(f"Receiving Message Error: {e}")
-                break
            
     def set_name(self):
         self.logo_label.configure(text=self.Auth_Name)
@@ -203,7 +206,7 @@ class MainGUI:
 
         if Ltype == "text":
             if self.username_entry.get() == "" or self.password_entry.get() == "":
-                print("NOT ACCEPTED")
+                print("Login Error\n\n")
                 self.username_entry.configure(bg_color="red")
                 self.password_entry.configure(bg_color="red")
                 self.WarningLabel.place(x=Main.winfo_screenwidth()/2 - 510, y=Main.winfo_screenheight()/2 + 25, anchor="center")
@@ -214,13 +217,14 @@ class MainGUI:
                     password = self.password_entry.get()
                     if user["id"] == username and user["password"] == password:
                         self.Auth_Name = user["name"]
-                        print("Login User:", self.Auth_Name)
+                        print("Login User:", self.Auth_Name,"\n\n")
                         self.start_chat = True
                         self.Get_Dashboard()
                         break
             else:
                 self.WarningLabel2.place(x=Main.winfo_screenwidth()/2 - 510, y=Main.winfo_screenheight()/2 + 25, anchor="center")
-
+        
+        # self.Get_Dashboard()
 
     def GoBack_Home(self):
         self.DestroyAll()
@@ -287,6 +291,8 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(('127.0.0.1', 5000))
 
 receive_thread = threading.Thread(target=gui.Recieve_Message)
+# time.sleep(2)
+receive_thread.daemon = True
 receive_thread.start()
 
 Main.mainloop()
