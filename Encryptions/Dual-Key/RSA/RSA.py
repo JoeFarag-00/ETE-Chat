@@ -42,6 +42,13 @@ class rsa_keygenerator:
         return self.phyn
     
     def gcd(self, a, b):
+        # let a = 13 and b = 48
+        # loop 0: a = 48, b = 13
+        # loop 1: a = 13, b = 9
+        # loop 2: a = 9, b = 4
+        # loop 3: a = 4, b = 1
+        # loop 4: a = 1, b = 0
+        # then the GCD is a (1)
         while b:
             a, b = b, a % b
         return a
