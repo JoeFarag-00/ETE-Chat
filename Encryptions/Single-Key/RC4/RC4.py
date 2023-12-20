@@ -1,5 +1,4 @@
 import numpy as np
-import re
 import copy
 import secrets
 class RC4:
