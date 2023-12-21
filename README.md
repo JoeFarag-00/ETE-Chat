@@ -1,5 +1,7 @@
 # ETE-Chat
 A simple local chat application that uses implemented End-to-end encryption techniques.
+![ETE](https://github.com/JoeFarag-00/ETE-Chat/assets/88057098/2d7b5fb0-51d8-47d9-b5f5-e52226bcfac5)
+
 ![image](https://github.com/JoeFarag-00/ETE-Chat/assets/88057098/bb14803b-fe25-4bc1-a3fc-69a26b95424c)
 
 # UI
