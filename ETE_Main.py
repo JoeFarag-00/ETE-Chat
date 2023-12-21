@@ -15,6 +15,7 @@ from tkinter_webcam import webcam
 import time
 import sys
 import socket
+import re
 
 sys.path.append('Encryptions/Single-Key/Classical')
 from Caesar import caesar
@@ -28,8 +29,10 @@ sys.path.append('Encryptions/Single-Key/Classical')
 from RowTransposition import rowtransposition
 sys.path.append('Encryptions/Single-Key/Classical')
 from Vigenere import vigenere
+sys.path.append('Encryptions/Single-Key/DES')
+from eDES import edDES
 sys.path.append('Encryptions/Dual-Key/RSA')
-from edRSA import RSA_KeyGen
+from edRSA import rsa_keygenerator
 
 User_Logo = customtkinter.CTkImage(light_image=Image.open("Assets/person.png"),
                                   size=(100, 100))
@@ -46,7 +49,11 @@ class MainGUI:
         self.Rec_Message = None
         self.Auth_Name = ""
         self.Rec_Type = None
+        self.CurEnc_Stat = "None"
+        self.IsChanged = False
         self.loaded_dashboard_event = threading.Event()
+        self.Encryptions = ["#DES", "#AES", "#RSA", "#RC4", "#El Gammal", "#Caesar", "#Monoalphabetic","#PlayFair","#RailFence","#Row Transposition", "#Vigenere", "#None"]
+        self.Enc_Structure = r"#([^#]+)#([^#]+)$"
         # self.KeyBox = None
         # self.KeyEntry = None
 
@@ -239,64 +246,101 @@ class MainGUI:
                                                         text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
             self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
             
+        elif Type == "DES":
+            self.IsEncryption = True
+            try:
+                self.KeyBox.destroy()
+                self.KeyEntry.destroy()
+                self.Set_Key_Button.destroy()
+            except:
+                pass
+            
+            self.KeyEntry = customtkinter.CTkEntry(self.sidebar_frame, placeholder_text="Enter Key (56)")
+            self.KeyEntry.grid(row=4, column=0, padx=(0, 0), pady=(5, 5))
+                
+            self.Set_Key_Button = customtkinter.CTkButton(self.sidebar_frame, text="Set", fg_color="transparent", border_width=2,
+                                                        text_color=("gray10", "#DCE4EE"), command=self.Set_Key)
+            self.Set_Key_Button.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
+            
     def Set_Key(self):
         self.WarningLabel3 = customtkinter.CTkLabel(Main, text="Incorrect Key", font=customtkinter.CTkFont(size=12, weight="bold"), text_color="red")
         
-        Type = self.Encryption_Box.get()
+        self.Type = self.Encryption_Box.get()
         
-        if Type == "None" or Type == "Choose Encryption":
+        if self.Type == "None" or self.Type == "Choose Encryption":
             self.IsEncryption = False
-        elif Type == "Caesar":
+            self.IsChanged = True
+        elif self.Type == "Caesar":
             self.IsEncryption = True
+            self.IsChanged = True
             try:
-                key = int(self.KeyEntry.get())
-                self.Caesar = caesar(key)
-                print("Caesar Loaded Key: ", key,"\n")
+                self.Enc_Key = int(self.KeyEntry.get())
+                self.Caesar = caesar(self.Enc_Key)
+                print("Caesar Loaded Key: ", self.Enc_Key,"\n")
             except Exception as e:
                 print("Caesar Error", e)
-        elif Type == "Monoalphabetic":
+        elif self.Type == "Monoalphabetic":
             self.IsEncryption = True
+            self.IsChanged = True
             try:
-                key = self.KeyBox.get("0.0", "end")
-                self.Mono = monoalphabetic(key)
-                print("Monoalphabetic Loaded Key: ", key,"\n")
+                self.Enc_Key = self.KeyBox.get("0.0", "end")
+                self.Mono = monoalphabetic(self.Enc_Key)
+                print("Monoalphabetic Loaded Key: ", self.Enc_Key,"\n")
             except Exception as e:
                 print("Monoalphabetic Error:",e)
-        elif Type == "PlayFair":
+        elif self.Type == "PlayFair":
             self.IsEncryption = True
+            self.IsChanged = True
             try:
-                key = self.KeyBox.get("0.0", "end")
-                self.PlayFair = playfair(key)
-                print("PlayFair Loaded Key: ", key,"\n")
+                self.Enc_Key = self.KeyBox.get("0.0", "end")
+                self.PlayFair = playfair(self.Enc_Key)
+                print("PlayFair Loaded Key: ", self.Enc_Key,"\n")
             except Exception as e:
                 print("PlayFair Error:",e)
-        elif Type == "RailFence":
+        elif self.Type == "RailFence":
             self.IsEncryption = True
+            self.IsChanged = True
             try:
-                key = int(self.KeyEntry.get())
-                self.RailFence = railfence(key)
-                print("RailFence Loaded Key: ", key,"\n")
+                self.Enc_Key = int(self.KeyEntry.get())
+                self.RailFence = railfence(self.Enc_Key)
+                print("RailFence Loaded Key: ", self.Enc_Key,"\n")
             except Exception as e:
                 print("RailFence Error", e)
-        elif Type == "Row Transposition":
+        elif self.Type == "Row Transposition":
             self.IsEncryption = True
+            self.IsChanged = True
             try:
-                key = self.KeyEntry.get()
-                self.RowTrans = rowtransposition(key)
-                print("Row Transposition Loaded Key: ", key,"\n")
+                self.Enc_Key = self.KeyEntry.get()
+                self.RowTrans = rowtransposition(self.Enc_Key)
+                print("Row Transposition Loaded Key: ", self.Enc_Key,"\n")
             except Exception as e:
                 print("Row Transposition Error", e)
-        elif Type == "Vigenere":
+        elif self.Type == "Vigenere":
             self.IsEncryption = True
+            self.IsChanged = True
             try:
-                key = self.KeyBox.get("0.0", "end")
-                self.Vigenere = vigenere(key)
-                print("Vigenere Loaded Key: ", key,"\n")
+                self.Enc_Key = self.KeyBox.get("0.0", "end")
+                self.Vigenere = vigenere(self.Enc_Key)
+                print("Vigenere Loaded Key: ", self.Enc_Key,"\n")
             except Exception as e:
                 print("Vigenere Error", e)
-     
-            
-            
+        elif self.Type == "DES":
+            self.IsEncryption = True
+            self.IsChanged = True
+            try:
+                self.Enc_Key = self.KeyEntry.get()
+                self.EncDES = edDES()
+                print("DES Loaded Key: ", self.Enc_Key,"\n")
+            except Exception as e:
+                print("DES Error", e)
+
+        #FOR SYNC ENCRYPTIONS
+        # self.CurEnc_Stat = "#"+self.Type+"#"+str(self.Enc_Key)
+        # print("Current Encryption: ",self.CurEnc_Stat)
+        
+        # client_socket.send(self.CurEnc_Stat.encode('utf-8'))
+
+
     def Send_Message(self):
         Send_Message = self.entry.get()
         Type = self.Encryption_Box.get()
@@ -339,15 +383,49 @@ class MainGUI:
                 Encrypted_Message = self.Vigenere.encrypt(Send_Message)
                 print("Vigenere Message:", Encrypted_Message,"\n\n")
                 client_socket.send(Encrypted_Message.encode('utf-8'))
+            elif Type == "DES":
+                # Send_Message = self.Fix_Spacing(Send_Message, 1)
+                Send_Message = self.EncDES.Pad_Characters(Send_Message)
+                Send_Message = ''.join(format(ord(char), '08b') for char in Send_Message)
+                Key_BN = ''.join(format(ord(char), '08b') for char in self.Enc_Key)
+                Encrypted_Message = self.EncDES.Encrypt(Send_Message, Key_BN)
+                print("Encrypted_Message", Encrypted_Message,"\n\n")
+                client_socket.send(Encrypted_Message.encode('utf-8'))
             
             # self.textbox.configure(state="disabled")
                     
     def Recieve_Message(self):
         while True:
-                self.Rec_Message = None 
-                self.Rec_Message = client_socket.recv(1024).decode('utf-8')
-                print("Received Encrypted:",self.Rec_Message)
+            self.Rec_Message = None 
+            self.Rec_Message = client_socket.recv(1024).decode('utf-8')
+            
+            Match_Method = re.match(r"#([^#]+)#([^#]+)$", self.Rec_Message)
 
+            if Match_Method:
+                self.Rec_Type = Match_Method.group(1)
+                self.Enc_Key = Match_Method.group(2)
+                
+                self.Enc_Key = str(self.Enc_Key)
+                
+                self.Encryption_Box.set(self.Rec_Type)
+                # print("ENTER")
+                self.Encryption_Callback(self.Rec_Type)
+                try:
+                    self.KeyEntry.delete(0,"end")
+                    self.KeyEntry.insert(self.Enc_Key)
+                except Exception as e:
+                    print(e)
+                
+                try:
+                    self.KeyBox.delete("0.0","end")
+                    self.KeyBox.insert(self.Enc_Key)
+                except Exception as e:
+                    print(e)
+                    
+                self.Set_Key()
+                
+            else:
+                print("Received Encrypted:",self.Rec_Message,"\n")  
                 if self.Rec_Type == "None" or not self.IsEncryption:
                     self.textbox.insert("end", f"[Mina]:\n{self.Rec_Message}\n\n")
                 elif self.Rec_Type == "Caesar":
@@ -380,6 +458,17 @@ class MainGUI:
                     Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
                     print("Received Decrypted:",Dec_Rec_Message,"\n\n")
                     self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
+                elif self.Rec_Type == "DES":
+                    Key_BN = ''.join(format(ord(char), '08b') for char in self.Enc_Key)
+                    Dec_Rec_Message = self.EncDES.Decrypt(self.Rec_Message,Key_BN)
+                    Dec_Rec_Message = self.EncDES.Remove_Padding(Dec_Rec_Message)
+                    # Dec_Rec_Message = self.Fix_Spacing(Dec_Rec_Message, 2)
+                    print("Received Decrypted:",Dec_Rec_Message,"\n\n")
+                    self.textbox.insert("end", f"[Mina]:\n{Dec_Rec_Message}\n\n")
+                    
+            if not self.Rec_Message:
+                break
+                
            
     def set_name(self):
         self.logo_label.configure(text=self.Auth_Name)
