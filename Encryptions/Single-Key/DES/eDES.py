@@ -125,7 +125,16 @@ class edDES:
         
 
     def Permutate(self, data, table):
-        return ''.join(data[i - 1] for i in table)
+        print(f"Data: {data}, Table: {table}")
+        result = ''
+        
+        for i in table:
+            if 1 <= i <= len(data):
+                result += data[i - 1]
+            else:
+                print(f"Warning: Index {i} is out of range for data '{data}'")
+                
+        return result
 
     def Generate_Subkeys(self, key):
         key = self.Permutate(key, self.pc1_table)
@@ -155,44 +164,68 @@ class edDES:
         return result
 
     def Encrypt(self, plain_text, key):
-        plain_text = self.Permutate(plain_text, self.ip_table)
+        blocks = [plain_text[i:i+64] for i in range(0, len(plain_text), 64)]
+        encrypted_blocks = []
 
-        subkeys = self.Generate_Subkeys(key)
+        for block in blocks:
+            block = self.Permutate(block, self.ip_table)
 
-        left, right = plain_text[:32], plain_text[32:]
+            subkeys = self.Generate_Subkeys(key)
 
-        for subkey in subkeys:
-            new_right = bin(int(left, 2) ^ int(self.Feistel_Function(right, subkey), 2))[2:].zfill(32)
-            left = right
-            right = new_right
+            left, right = block[:32], block[32:]
 
-        cipher_text = self.Permutate(right + left, self.fp_table)
-        return cipher_text
+            for subkey in subkeys:
+                new_right = bin(int(left, 2) ^ int(self.Feistel_Function(right, subkey), 2))[2:].zfill(32)
+                left = right
+                right = new_right
+
+            encrypted_block = self.Permutate(right + left, self.fp_table)
+            encrypted_blocks.append(encrypted_block)
+
+        return ''.join(encrypted_blocks)
 
     def Decrypt(self, cipher_text, key):
-        cipher_text = self.Permutate(cipher_text, self.ip_table)
+        blocks = [cipher_text[i:i+64] for i in range(0, len(cipher_text), 64)]
+        decrypted_blocks = []
 
-        subkeys = self.Generate_Subkeys(key)[::-1]
+        for block in blocks:
+            block = self.Permutate(block, self.ip_table)
 
-        left, right = cipher_text[:32], cipher_text[32:]
+            subkeys = self.Generate_Subkeys(key)[::-1]
 
-        for subkey in subkeys:
-            new_right = bin(int(left, 2) ^ int(self.Feistel_Function(right, subkey), 2))[2:].zfill(32)
-            left = right
-            right = new_right
+            left, right = block[:32], block[32:]
 
-        plain_text_binary = self.Permutate(right + left, self.fp_table)
+            for subkey in subkeys:
+                new_right = bin(int(left, 2) ^ int(self.Feistel_Function(right, subkey), 2))[2:].zfill(32)
+                left = right
+                right = new_right
 
-        plain_text = ''.join(chr(int(plain_text_binary[i:i + 8], 2)) for i in range(0, len(plain_text_binary), 8))
-        return plain_text
+            plain_text_binary = self.Permutate(right + left, self.fp_table)
+
+            plain_text = ''.join(chr(int(plain_text_binary[i:i + 8], 2)) for i in range(0, len(plain_text_binary), 8))
+            decrypted_blocks.append(plain_text)
+
+        return ''.join(decrypted_blocks)
+    
+    def Pad_Characters(self,input_string):
+        character_count = len(input_string)
+        spaces_needed = (8 - character_count % 8) % 8
+        padded_string = input_string + " " * spaces_needed
+        return character_count, padded_string
+    
+    def Remove_Padding(self,input_string):
+        unpadded_string = input_string.rstrip()
+        return unpadded_string
+
 
 if __name__ == "__main__":
-
-    plaintext = "Hello, world!"
+    
+    plaintext = "Hello, I am king Youssef the Great."
     key = "secretke"
 
     des_instance = edDES()
     
+    Cct, plaintext = des_instance.Pad_Characters(plaintext)
     plaintext_binary = ''.join(format(ord(char), '08b') for char in plaintext)
     key_binary = ''.join(format(ord(char), '08b') for char in key)
 
@@ -200,4 +233,8 @@ if __name__ == "__main__":
     print(f"Encrypted Text: {encrypted_text}")
 
     decrypted_text = des_instance.Decrypt(encrypted_text, key_binary)
+    decrypted_text = des_instance.Remove_Padding(decrypted_text)
+    
     print(f"Decrypted Text: {decrypted_text}")
+    
+    
