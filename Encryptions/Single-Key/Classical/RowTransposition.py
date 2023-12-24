@@ -61,16 +61,33 @@ class rowtransposition(Coding.coding):
                 decryption += c        
         return decryption
 
+    def sortme(self):
+        temp = []
+        for i in range(0, len(self.key)):
+            temp.append(int(self.key[i]))
+        if max(temp) == len(temp): return
+        
+        for i in range(1, max(temp)):
+            if i not in temp:
+                for j in range(0, len(temp)):
+                    if i < temp[j]:
+                        temp.insert(j, i)
+                        break
+        self.key = ""
+        for i in temp:
+            self.key += str(i)
 
     def set_key(self, key : int):
+
         key = str(key)
         self.key = re.sub(r'[^0-9]', '', key)
+        self.sortme()
         self.dic = [[int(i) - 1 for i in self.key]]
 
 
 if __name__ == "__main__":
-    cypher = rowtransposition("4312567")
-    print(cypher.dic)
+    cypher = rowtransposition("15679")
+    print("Dic: ",cypher.dic)
     print(cypher.encrypt("Hello World, I am a cypher"))
     print(cypher.decrypt(cypher.encrypt("Hello World, I am a cypher")))
 
